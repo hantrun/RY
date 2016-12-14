@@ -1,0 +1,45 @@
+Configuration	Test
+STM32CubeMX 	4.16.1
+Date	10/22/2016
+MCU	STM32F407VGTx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+51	PB12	GPIO_Output	
+52	PB13	GPIO_Output	
+53	PB14	GPIO_Output	
+54	PB15	GPIO_Output	
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : Test
+Project Folder : D:\Projects\Test
+Toolchain / IDE : SW4STM32
+Firmware Package Name and Version : STM32Cube FW_F4 V1.13.1
+
+
+Code Generation Settings : 
+STM32Cube Firmware Library Package : Copy only the necessary library files
+Generate peripheral initialization as a pair of '.c/.h' files per peripherals : No
+Backup previously generated files when re-generating : No
+Delete previously generated files when not re-generated : Yes
+Set all free pins as analog (to optimize the power consumption) : No
+
+
+Toolchains Settings : 
+Compiler Optimizations : Balanced Size/Speed
+
+
+
+
+
+
