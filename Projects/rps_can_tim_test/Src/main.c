@@ -34,9 +34,8 @@
 #include "stm32f4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
-#include "stm32f4xx.h"
-#include "stm32f4xx_it.h"
 #include "canid.h"
+#include "main.h"
 #define calc 4
 #define toothcount 48
 #define BOARDID 0x06
@@ -48,7 +47,6 @@ uint32_t timerValue = 0;
 
 /* Private variables ---------------------------------------------------------*/
 CAN_HandleTypeDef hcan1;
-
 TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
@@ -64,7 +62,6 @@ static void MX_TIM3_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void sendMSG(uint32_t MSG, uint32_t ID, uint8_t DLC);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -238,10 +235,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
 }
 
 /* USER CODE BEGIN 4 */
@@ -251,24 +244,21 @@ void sendMSG(uint32_t MSG, uint32_t ID, uint8_t DLC) {
 	hcan1.pTxMsg->Data[0] = 123;
 	HAL_CAN_Transmit(&hcan1, 1);
 }
-
-void EXTI0_IRQHandler(void){
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-  /* USER CODE BEGIN EXTI0_IRQn 1 */
-  timerValue = __HAL_TIM_GetCounter(&htim3);
-      if (interation <= calculation_intervall && interation >= 0){
-          tooth_[interation] = (__HAL_TIM_GetCounter(&htim3) - timerValue);
-          interation++;
-      }else{
-  		//using a loop takes a bit of time, but it allows us to calculate rps with like 100tooth, yeah i know it kinda useless
-  		uint32_t subtotal = 0;
-  		for(int i = 0; i < calculation_intervall; i++){
-  			subtotal = subtotal + tooth_[i];
-  		}
-      uint32_t USec = 1000/((subtotal / calculation_intervall) * 20);
-      interation = 0;
-  	sendMSG(USec, CAN_ID_ECU_N_RPM_R, 1);
-      }
+void rps_interrupt(void){
+	timerValue = __HAL_TIM_GetCounter(&htim3);
+		if (interation <= calculation_intervall && interation >= 0){
+			tooth_[interation] = (__HAL_TIM_GetCounter(&htim3) - timerValue);
+			interation++;
+		}else{
+//using a loop takes a bit of time, but it allows us to calculate rps with like 100tooth, yeah i know it kinda useless
+			uint32_t subtotal = 0;
+			for(int i = 0; i < calculation_intervall; i++){
+				subtotal = subtotal + tooth_[i];
+			}
+			uint32_t USec = 1000/((subtotal / calculation_intervall) * 20);
+			interation = 0;
+			sendMSG(USec, CAN_ID_ECU_N_RPM_R, 1);
+		}
 }
 /* USER CODE END 4 */
 
